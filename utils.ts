@@ -2,10 +2,15 @@ import {Observable as O, Subject, ReplaySubject} from 'rxjs'
 import {nav, hr, div, a, input, form, strong, span, button} from '@cycle/dom'
 
 export function spread(...arr) {
-  return Object.assign({}, ...arr)
+  return (<any>Object).assign({}, ...arr)
 }
 
-export function createProxy(){
+
+interface ProxyObservable<T> extends O<T> {
+  attach: (Observable) => void
+}
+
+export function createProxy(): ProxyObservable<any> {
   let sub
   const source = new Subject()
   const proxy = source.finally(() => {
@@ -14,11 +19,11 @@ export function createProxy(){
     }
   }).publish().refCount()
 
-  proxy.attach = (stream) => {
+  ;(<ProxyObservable<any>> proxy).attach = (stream) => {
     sub = stream.subscribe(source)
   }
 
-  return proxy
+  return <ProxyObservable<any>> proxy
 }
 
 export function combineObj(obj) {

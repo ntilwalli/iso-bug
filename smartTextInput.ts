@@ -1,7 +1,7 @@
 import {Observable as O} from 'rxjs'
 import {div, input} from '@cycle/dom'
 import isolate from '@cycle/isolate'
-import Immutable from 'immutable'
+import Immutable = require('immutable')
 import {combineObj, spread, traceStartStop} from './utils'
 
 function intent(sources) {
@@ -62,7 +62,7 @@ function model(actions, inputs) {
       props$: inputs.initialText$.take(1),
       disabled$: inputs.disabled$.take(1)
     })
-    .map((info) => {
+    .map((info: any) => {
       //console.log(`info smart text input:`, info)
       const {props, disabled} = info
       const parsed = parser(props)
@@ -74,15 +74,15 @@ function model(actions, inputs) {
       })
     })
     .switchMap(init => {
-      return reducer$.startWith(init).scan((acc, f) => f(acc))
+      return reducer$.startWith(init).scan((acc, f: Function) => f(acc))
     })
-    .map((x) => x.toJS())
+    .map((x: any) => x.toJS())
     .do(x => console.log(`textInput state:`, x))
     .publishReplay(1).refCount()
 }
 
 function view(state$, props$) {
-  return combineObj({state$, props$}).map((info) => {
+  return combineObj({state$, props$}).map((info: any) => {
     const {state, props} = info
     const placeholder = props && props.placeholder ? props.placeholder : undefined
     const type = props && props.type === `password` ? props.type : `text`
@@ -112,7 +112,7 @@ function main(sources, inputs) {
     .letBind(traceStartStop(`DOM trace`))
 
   const output$ = state$
-      .map((state) => state.isValid ? state.value : undefined)
+      .map((state: any) => state.isValid ? state.value : undefined)
       .letBind(traceStartStop(`output$ trace`))
       .publishReplay(1).refCount()
 
